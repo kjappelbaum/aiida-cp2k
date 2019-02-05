@@ -13,6 +13,7 @@ from .dftutilities import dict_merge, get_atom_kinds, default_options, empty_pd
 # calculation objects
 Cp2kCalculation = CalculationFactory('cp2k')
 
+# This is a general input that runs PBE-D3(BJ) for ENERGY, MD-NPT_F, GEO_OPT, CELL_OPT
 cp2k_default_parameters = {
     'GLOBAL':{
             'RUN_TYPE': 'ENERGY',
@@ -45,7 +46,7 @@ cp2k_default_parameters = {
             },
             'SCF':{
                 'SCF_GUESS': 'ATOMIC',
-                'EPS_SCF': 1.0e-6,
+                'EPS_SCF': 1.0e-7,
                 'MAX_SCF': 50,
                 'MAX_ITER_LUMO': 10000, #needed for the bandgap
                 'OT':{
@@ -53,7 +54,7 @@ cp2k_default_parameters = {
                     'PRECONDITIONER': 'FULL_ALL',
                     },
                 'OUTER_SCF':{
-                    'EPS_SCF': 1.0e-6,
+                    'EPS_SCF': 1.0e-7,
                     'MAX_SCF': 10,
                     },
                 'PRINT':{
@@ -87,11 +88,17 @@ cp2k_default_parameters = {
                     'STRIDE': '1 1 1',
                 },
                 'MO_CUBES': {
-                    '_': 'ON', # this is to print the band gap
+                    '_': 'ON', # this is to print the band gap but only at the end of CELL_OPT/MD/GEO_OPT
                     'WRITE_CUBE': 'F',
                     'STRIDE': '1 1 1',
                     'NLUMO': 1,
                     'NHOMO': 1,
+                    'ADD_LAST': 'SYMBOLIC',
+                    'EACH': {
+                     'CELL_OPT' : 0,
+                     'GEO_OPT'  : 0,
+                     'MD' : 0,
+                    }
                 },
                 'MULLIKEN': {
                     '_': 'ON',  #default: ON
@@ -112,6 +119,91 @@ cp2k_default_parameters = {
             },
         },
     },
+    'MOTION': {
+        'GEO_OPT': {
+            'TYPE': 'MINIMIZATION',                     #default: MINIMIZATION
+            'OPTIMIZER': 'BFGS',                        #default: BFGS
+            'MAX_ITER': 50,                             #default: 200
+            'MAX_DR':    '[bohr] 0.0030',               #default: [bohr] 0.0030
+            'RMS_DR':    '[bohr] 0.0015',               #default: [bohr] 0.0015
+            'MAX_FORCE': '[bohr^-1*hartree] 0.00045',   #default: [bohr^-1*hartree] 0.00045
+            'RMS_FORCE': '[bohr^-1*hartree] 0.00030',   #default: [bohr^-1*hartree] 0.00030
+            'BFGS' : {
+                'TRUST_RADIUS': '[angstrom] 0.25',      #default: [angstrom] 0.25
+            },
+        },
+        'CELL_OPT': {
+            'TYPE': 'DIRECT_CELL_OPT',                 #default: DIRECT_CELL_OPT
+            'KEEP_ANGLES' : False,                     #default: False
+            'KEEP_SYMMETRY': False,                    #default: False (works only if symm is specified in the &CELL)
+            'OPTIMIZER': 'BFGS',                       #default: BFGS
+            'MAX_ITER': 100,                           #default: 200
+            'EXTERNAL_PRESSURE': '[bar] 1.0',          #default: [bar] 100 0 0 0 100 0 0 0 100
+            'PRESSURE_TOLERANCE': '[bar] 100',         #default: [bar] 100
+            'MAX_DR':    '[bohr] 0.030',               #default: [bohr] 0.0030
+            'RMS_DR':    '[bohr] 0.015',               #default: [bohr] 0.0015
+            'MAX_FORCE': '[bohr^-1*hartree] 0.0010',   #default: [bohr^-1*hartree] 0.00045
+            'RMS_FORCE': '[bohr^-1*hartree] 0.0007',   #default: [bohr^-1*hartree] 0.00030
+            'BFGS' : {
+                'TRUST_RADIUS': '[angstrom] 0.25',     #default: [angstrom] 0.25
+            },
+        },
+        'MD': {
+            'ENSEMBLE': 'NPT_F',                    #main options: NVT, NPT_F
+            'STEPS': 20,                            #default: 3
+            'TIMESTEP': '[fs] 0.5',                 #default: [fs] 0.5
+            'TEMPERATURE': '[K] 300',               #default: [K] 300
+            'DISPLACEMENT_TOL': '[angstrom] 1.0',   #default: [bohr] 100
+            'THERMOSTAT' : {
+                'TYPE': 'CSVR',
+                'CSVR': {
+                    'TIMECON': 0.1,                 #default: 1000, use: 0.1 for equilibration, 50~100 for production
+                },
+            },
+            'BAROSTAT': {                           #by default the barosthat uses the same thermo as the partricles
+                'PRESSURE': '[bar] 1.0',            #default: 0.0
+                'TIMECON': '[fs] 1000',             #default: 1000, good for crystals
+            },
+            'PRINT': {
+                'ENERGY': {
+                    '_': 'OFF',                     #default: LOW (print .ener file)
+                },
+            },
+        },
+        'PRINT': {
+            'TRAJECTORY': {
+                'FORMAT': 'DCD_ALIGNED_CELL',
+                'EACH': {
+                    'CELL_OPT' : 1,
+                    'GEO_OPT'  : 1,
+                    'MD' : 1,
+                },
+            },
+            'RESTART':{
+                'BACKUP_COPIES': 0,
+                'EACH': {
+                    'CELL_OPT' : 1,
+                    'GEO_OPT'  : 1,
+                    'MD' : 1,
+                },
+            },
+            'RESTART_HISTORY':{
+                '_': 'OFF'
+                },
+            },
+            'CELL': {
+                '_': 'OFF',
+            },
+            'FORCES': {
+                '_': 'OFF',
+            },
+            'STRESS': {
+                '_': 'OFF',
+            },
+            'VELOCITIES': {
+                '_': 'OFF',
+            },
+        },
 }
 
 def last_scf_loop(fpath):
@@ -160,6 +252,7 @@ class Cp2kDftBaseWorkChain(WorkChain):
         spec.input('parameters', valid_type=ParameterData, default=empty_pd)
         spec.input('_options', valid_type=dict, default=deepcopy(default_options))
         spec.input('parent_folder', valid_type=RemoteData, default=None, required=False)
+        spec.input('run_type', valid_type=Str, default=Str('energy'), required=False)
 
         # specify the chain of calculations to be performed
         spec.outline(
@@ -229,6 +322,21 @@ class Cp2kDftBaseWorkChain(WorkChain):
             self.ctx.parameters['FORCE_EVAL']['DFT']['SCF']['SCF_GUESS'] = 'RESTART'
         else:
             self.ctx.parameters['FORCE_EVAL']['DFT']['SCF']['SCF_GUESS'] = 'ATOMIC'
+
+        if self.inputs.run_type=='energy':
+            self.ctx.parameters.pop('MOTION')
+        elif self.inputs.run_type=='cell_opt':
+            self.ctx.parameters['GLOBAL']['RUN_TYPE'] = 'CELL_OPT'
+            dict_merge(self.ctx.parameters, deepcopy(disable_printing_charges_dict))
+            dict_merge(self.ctx.parameters, {'FORCE_EVAL':{'PRINT':{'FORCES':{'_': 'OFF'}}}}) # TODO: needed?
+        elif self.inputs.run_type=='geo_opt':
+            self.ctx.parameters['GLOBAL']['RUN_TYPE'] = 'GEO_OPT'
+            dict_merge(self.ctx.parameters, deepcopy(disable_printing_charges_dict))
+            dict_merge(self.ctx.parameters, {'FORCE_EVAL':{'PRINT':{'FORCES':{'_': 'OFF'}}}}) # TODO: needed?
+        elif self.inputs.run_type=='md':
+            self.ctx.parameters['GLOBAL']['RUN_TYPE'] = 'MD'
+            dict_merge(self.ctx.parameters, deepcopy(disable_printing_charges_dict))
+            dict_merge(self.ctx.parameters, {'FORCE_EVAL':{'PRINT':{'FORCES':{'_': 'OFF'}}}}) # TODO: needed?
 
         # TODO: add geometry restart if it is possible to do so
 

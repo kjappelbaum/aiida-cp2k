@@ -10,7 +10,7 @@ basis_set={
            "F"  : "DZVP-MOLOPT-SR-GTH-q7",
            "Ne" : "DZVP-MOLOPT-SR-GTH-q8",
            "Na" : "DZVP-MOLOPT-SR-GTH-q9",
-           "Mg" : "DZVP-MOLOPT-SR-GTH-q2",
+           "Mg" : "DZVP-MOLOPT-SR-GTH-q2", #default: q10, which requires a very high CUTOFF (>1000Ry)
            "Al" : "DZVP-MOLOPT-SR-GTH-q3",
            "Si" : "DZVP-MOLOPT-SR-GTH-q4",
            "P"  : "DZVP-MOLOPT-SR-GTH-q5",
