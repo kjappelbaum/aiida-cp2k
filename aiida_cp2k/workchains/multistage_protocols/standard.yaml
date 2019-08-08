@@ -1,34 +1,106 @@
 # Defining atomic properties
 
 initial_magnetization:
+  # main group elements
+  #  alkali
   H:  0
-  Li: 0  # oxidation state +1
-  Be: 0  # oxidation state +2
+  Li: 0
+  Na: 0
+  K:  0
+  Rb: 0
+  Cs: 0
+  # earth alkali
+  Be: 0
+  Mg: 0
+  Ca: 0
+  Sr: 0
+  Ba: 0
+  # boron group
   B:  0
+  Al: 0
+  Ga: 0
+  In: 0
+  Tl: 0
+  # carbon group
   C:  0
-  N:  0
-  O:  0
-  F:  0
-  Na: 0  # oxidation state +1
-  Mg: 0  # oxidation state +2
-  Al: 0  # oxidation state +3
   Si: 0
-  P:  0
+  Ge: 0
+  Sn: 0
+  Pb: 0
+  # nitrogen group
+  N:  0
+  P: 0
+  As: 0
+  Sb: 0
+  Bi: 0
+  # chalcogenides
+  O:  0
   S:  0
+  Se: 0
+  Te: 0
+  # halogens
+  F:  0
   Cl: 0
-  K:  0  # oxidation state +1
-  Ca: 0  # oxidation state +2
+  Br: 0
+  I: 0
+  # noble gases
+  He: 0
+  Ne: 0
+  Ar: 0
+  Kr: 0
+  # d-block
+  # 1
   Sc: 0  # oxidation state +1
+  Y: 0
+  # 2
   Ti: 0  # oxidation state +4
+  Zr: 0
+  Hf: 0
+  # 3
   V:  3  # oxidation state +2 high spin
+  Nb: 3  # oxidation state +2 high spin
+  # 4
   Cr: 4  # oxidation state +2 high spin
+  Mo: 4
+  W: 4
+  # 5
   Mn: 5  # oxidation state +2 high spin
-  Fe: 4  # oxidation state +2 high spin
+  Re: 0
+  # 6
+  Fe: 5  # oxidation state +3 high spin
+  Ru: 5  # oxidation state +3 high spin
+  Os: 5
+  # 7
   Co: 3  # oxidation state +2 high spin
+  Rh: 5  # oxidation state +3 high spin
+  Ir: 5
+  # 8
   Ni: 2  # oxidation state +2 high spin
+  Pd: 0  # d8, square planar
+  Pt: 0  # d8, square planar
+  #  9
   Cu: 1  # oxidation state +2 high spin
+  Ag: 1
+  Au: 1
+  # 10
   Zn: 0  # oxidation state +2
-  Zr: 0  # oxidation state +4
+  Cd: 0
+  Hg: 0
+  # Lanthanides
+  La: 0
+  Ce: 1
+  Pr: 2
+  Nd: 3
+  Sm: 5
+  Eu: 6
+  Gd: 7
+  Tb: 6
+  Dy: 5
+  Ho: 4
+  Er: 3
+  Tm: 2
+  Yb: 1
+  Lu: 0
 
 basis_set:
   H:  DZVP-MOLOPT-SR-GTH-q1
@@ -307,7 +379,7 @@ settings_1: # alternative settings #1, using smearing+diagonalization
   FORCE_EVAL:
     DFT:
       QS:
-        EXTRAPOLATION: USE_PREV_WF  #ASPC not good wioth smearing
+        EXTRAPOLATION: USE_PREV_WF  #ASPC not good with smearing
       SCF:
         MAX_SCF: 400                # not too many: it has 5 GEO_OPT to converge initially
         ADDED_MOS: 1000
@@ -355,7 +427,7 @@ stage_1:
         TYPE: CSVR
         CSVR:
           TIMECON: "[fs] 0.1"   ### SLing: 0.1 small time constant (strong coupling) for equilibration; change to 50~100 or bigger for production run
-      BAROSTAT:                 #by default the barosthat uses the same thermo as the partricles
+      BAROSTAT:                 #by default the barostat uses the same thermo as the partricles
         PRESSURE: "[bar] 0.0"  #default: 0.0
         TIMECON:  "[fs] 500"   #default: 1000, good for crystals
 
