@@ -1,0 +1,9 @@
+[console_scripts]
+reentry = reentry.cli:reentry
+
+[distutils.setup_keywords]
+reentry_register = reentry.hooks:register_dist
+
+[test_entry_points]
+test = reentry.cli:reentry
+

@@ -1,0 +1,16 @@
+click
+setuptools>=36.2
+six
+
+[dev]
+astroid==2.1.0
+coverage
+flake8
+packaging
+pre-commit==1.14.4
+prospector==1.1.5
+pylint==2.2.2
+pytest
+pytest-cov
+tox
+yapf==0.27.0
