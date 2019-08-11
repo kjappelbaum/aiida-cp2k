@@ -14,7 +14,7 @@ import sys
 import ase.build
 
 from aiida.engine import run
-from aiida.orm import Code, Dict, StructureData, Float, Str
+from aiida.orm import (Code, Dict, StructureData)
 from aiida.common import NotExistent
 from aiida_cp2k.workchains import Cp2kMultistageWorkChain
 
@@ -30,7 +30,7 @@ except NotExistent:
     print("The code '{}' does not exist".format(codename))
     sys.exit(1)
 
-print("Testing CP2K multistage workchain on H2O (RKS, no need for smearing)...")
+print("Testing CP2K multistage workchain on H2O- (UKS, no need for smearing)...")
 
 # structure
 atoms = ase.build.molecule('H2O')
@@ -41,6 +41,9 @@ structure = StructureData(ase=atoms)
 parameters = Dict(dict={
         'FORCE_EVAL': {
           'DFT': {
+            'UKS': True,
+            'MULTIPLICITY': 2,
+            'CHARGE': -1,
             'MGRID': {
               'CUTOFF': 280,
               'REL_CUTOFF': 30,
@@ -53,8 +56,7 @@ options = {
     "max_wallclock_seconds": 1 * 3 * 60,
 }
 inputs = {
-    #'min_cell_size': Float(4.1),
-    'protocol_tag': Str('standard'),
+    'protocol_tag': Str('sp'),
     'base': {
         'cp2k': {
             'structure': structure,

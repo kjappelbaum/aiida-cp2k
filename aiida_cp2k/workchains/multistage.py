@@ -5,8 +5,8 @@ import ruamel.yaml as yaml #does not convert OFF to False
 import os
 from copy import deepcopy
 
-from aiida.common import AttributeDict
-from aiida.engine import append_, while_, WorkChain, ToContext
+from aiida.common import AttributeDict, NotExistent
+from aiida.engine import append_, while_, WorkChain, ToContext, ExitCode
 from aiida.engine import workfunction as wf
 from aiida.orm import Dict, Int, Float, SinglefileData, Str, RemoteData, StructureData
 from aiida.plugins import CalculationFactory
@@ -360,7 +360,13 @@ class Cp2kMultistageWorkChain(WorkChain):
     def inspect_and_update_stage(self):
         """ Update geometry, parent folder and the new &MOTION settings"""
         last_stage = self.ctx.stages[-1]
-        self.ctx.structure_new = last_stage.outputs.output_structure
+
+        # This his is in case the the first stage was a single point
+        try:
+            self.ctx.structure_new = last_stage.outputs.output_structure
+        except NotExistent:
+            self.ctx.structure_new = self.ctx.base_inp['cp2k']['structure']
+
         self.ctx.parent_calc_folder = last_stage.outputs.remote_folder
         last_stage.outputs.output_parameters.label = self.ctx.stage_tag
 
@@ -388,6 +394,9 @@ class Cp2kMultistageWorkChain(WorkChain):
         self.out('output_parameters', extract_results(**all_output_parameters))
         self.out('last_input_parameters',self.ctx.base_inp['cp2k']['parameters'])
         self.out_many(self.exposed_outputs(self.ctx.stages[-1], Cp2kBaseWorkChain)) #(output_structure and remote_folder)
-        self.report("Outputs: Dict<{}> and StructureData<{}>".format(self.outputs['output_parameters'].pk,self.outputs['output_structure'].pk))
 
-        return
+        if 'output_structure' in self.outputs.keys():
+            self.report("Outputs: Dict<{}> and StructureData<{}>".format(self.outputs['output_parameters'].pk,self.outputs['output_structure'].pk))
+        else:
+            self.report("Outputs: Dict<{}>".format(self.outputs['output_parameters'].pk))
+        return ExitCode(0)

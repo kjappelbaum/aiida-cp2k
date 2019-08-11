@@ -280,10 +280,29 @@ pseudopotential:
 
 # Defining input settings
 settings_0:                         # use smearing+diagonalization
+  GLOBAL:
+    PRINT_LEVEL: MEDIUM              #default: MEDIUM. Important to have the correct parsing
   FORCE_EVAL:
+    METHOD:         QUICKSTEP
+    STRESS_TENSOR:  ANALYTICAL
     DFT:
+      BASIS_SET_FILE_NAME:
+        - BASIS_MOLOPT
+        - BASIS_MOLOPT_UCL
+      POTENTIAL_FILE_NAME:
+        -  GTH_POTENTIALS
+      UKS:          False
+      CHARGE:       0
+      MULTIPLICITY: 0
+      MGRID:
+        CUTOFF:      600
+        REL_CUTOFF:  50
+        NGRIDS:      4
       QS:
-        EXTRAPOLATION:              USE_PREV_WF  #ASPC not good with smearing
+        METHOD: GPW
+        EPS_DEFAULT:   1.0E-10
+        EXTRAPOLATION: USE_PREV_WF
+
       SCF:
         MAX_SCF: 400                # not too many: it has 5 GEO_OPT to converge initially
         ADDED_MOS:                  1000
@@ -301,6 +320,63 @@ settings_0:                         # use smearing+diagonalization
           METHOD:                   BROYDEN_MIXING
           ALPHA:                    0.4
           NBROYDEN:                 8
+      XC:
+        XC_FUNCTIONAL:
+          PBE:
+            PARAMETRIZATION: ORIG
+        VDW_POTENTIAL:
+           POTENTIAL_TYPE:  PAIR_POTENTIAL
+           PAIR_POTENTIAL:
+              PARAMETER_FILE_NAME:   dftd3.dat
+              TYPE:                  DFTD3(BJ)
+              REFERENCE_FUNCTIONAL:   PBE
+      PRINT:
+        MO_CUBES:
+          WRITE_CUBE: F
+          ADD_LAST: SYMBOLIC
+          EACH:
+            CELL_OPT: 0
+            GEO_OPT: 0
+            MD: 0
+          NHOMO: 1  # all eigenvalues are dumped anyway
+          NLUMO: 1  # specified neigenvalues are dupmed
+        MULLIKEN:
+          _: 'ON'
+          ADD_LAST: SYMBOLIC
+          EACH:
+            CELL_OPT: 0
+            GEO_OPT: 0
+            MD: 0
+        LOWDIN:
+          _: 'OFF'
+        HIRSHFELD:
+          _: 'OFF'
+
+  MOTION:
+    PRINT:
+      TRAJECTORY:
+        FORMAT: DCD_ALIGNED_CELL
+        EACH:
+          CELL_OPT: 1
+          GEO_OPT: 1
+          MD: 1
+      RESTART:
+        BACKUP_COPIES: 0
+        EACH:
+          CELL_OPT: 1
+          GEO_OPT: 1
+          MD: 1
+      RESTART_HISTORY:
+        _: OFF
+      CELL:
+        _: OFF
+      VELOCITIES:
+        _: OFF
+      FORCES:
+        _: OFF
+      STRESS:
+        _: OFF
+
 
 # Defining stage's settings (relative to the &MOTION)
 stage_0:

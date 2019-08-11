@@ -64,6 +64,11 @@ parameters = Dict(
                     'PERIODIC': 'none',
                     'PSOLVER': 'MT',
                 },
+                'PRINT': {
+                        'E_DENSITY_CUBE': {
+                            '_': 'ON',
+                            'STRIDE': '1 1 1'
+                        }}
             },
             'SUBSYS': {
                 'KIND': [

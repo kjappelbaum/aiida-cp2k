@@ -9,17 +9,25 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
-
+import os
 import click
+
 import sys
 import ase.build
 
-from aiida.engine import run, submit
-from aiida.orm import Code, Dict, StructureData
+from aiida.engine import submit
+from aiida.orm import (Code, Dict, StructureData)
 from aiida.common import NotExistent
 from aiida_cp2k.workchains import Cp2kMultistageWorkChain
+from aiida.plugins import DataFactory
+# =============================================================================
+CifData = DataFactory('cif')
 
-# This is an expensive test, used as a proof-of-robustness
+
+# structure
+cif = CifData(file=os.path.abspath("../data/hkust-1.cif"))
+structure = cif.get_structure()
+structure.store()
 
 
 @click.command("cli")
@@ -31,36 +39,42 @@ def main(codelabel, run):
     except NotExistent:
         print("The code '{}' does not exist".format(codelabel))
         sys.exit(1)
-
-    print("Testing CP2K multistage workchain on Eu-MIL-153")
-
-    # structure
-    structure = StructureData(ase=ase.io.read("../data/eu-mil-103.cif"))
-    parameters = Dict(dict={})
-
-    options = {"resources": {"num_machines": 3}, "max_wallclock_seconds": 3 * 60 * 60}
+    # lowering the settings for a cheaper calculation
+    parameters = Dict(dict={
+            'FORCE_EVAL': {
+              'DFT': {
+                'MGRID': {
+                  'CUTOFF': 280,
+                  'REL_CUTOFF': 30,
+    }}}})
+    options = {"resources": {"num_machines": 2}, "max_wallclock_seconds": 15 * 60 * 60}
     inputs = {
-        "protocol_tag": Str("large_system"),
-        "starting_settings_idx": Int(0),
-        "base": {
-            "cp2k": {
-                "structure": structure,
-                "code": code,
-                "parameters": parameters,
-                "metadata": {"options": options},
+        'protocol_tag': Str('standard'),
+        'base': {
+            'cp2k': {
+                'structure': structure,
+                'parameters': parameters,
+                'code': code,
+                'metadata': {
+                    'options': options,
+                }
             }
-        },
+        }
     }
 
+
+    print("Testing CP2K multistage workchain on HKUST-1")
+
     if run:
-        submit(Cp2kMultistageWorkChain, **inputs)
+        submit(Cp2kMultistageWorkChain,
+                **inputs)
     else:
         print("Generating test input ...")
         inputs["base"]["cp2k"]["metadata"]["dry_run"] = True
         inputs["base"]["cp2k"]["metadata"]["store_provenance"] = False
         run(Cp2kMultistageWorkChain, **inputs)
         print("Submission test successful")
-        print("In order to actually submit, add '--submit'")
+        print("In order to actually submit, add '--run'")
 
 
 if __name__ == "__main__":
