@@ -42,33 +42,40 @@ class Cp2kCalculation(CalcJob):
         spec.input('settings', valid_type=Dict, required=False, help='additional input parameters')
         spec.input('resources', valid_type=dict, required=False, help='special settings')
         spec.input('parent_calc_folder', valid_type=RemoteData, required=False, help='remote folder used for restarts')
-        spec.input_namespace(
-            'file', valid_type=SinglefileData, required=False, help='additional input files', dynamic=True)
+        spec.input_namespace('file',
+                             valid_type=SinglefileData,
+                             required=False,
+                             help='additional input files',
+                             dynamic=True)
+
+        spec.input('metadata.options.withmpi', valid_type=bool, default=True)
 
         # Default file names, parser, etc..
-        spec.input(
-            'metadata.options.input_filename',
-            valid_type=six.string_types,
-            default=cls._DEFAULT_INPUT_FILE,
-            non_db=True)
-        spec.input(
-            'metadata.options.output_filename',
-            valid_type=six.string_types,
-            default=cls._DEFAULT_OUTPUT_FILE,
-            non_db=True)
-        spec.input(
-            'metadata.options.parser_name', valid_type=six.string_types, default=cls._DEFAULT_PARSER, non_db=True)
+        spec.input('metadata.options.input_filename',
+                   valid_type=six.string_types,
+                   default=cls._DEFAULT_INPUT_FILE,
+                   non_db=True)
+        spec.input('metadata.options.output_filename',
+                   valid_type=six.string_types,
+                   default=cls._DEFAULT_OUTPUT_FILE,
+                   non_db=True)
+        spec.input('metadata.options.parser_name',
+                   valid_type=six.string_types,
+                   default=cls._DEFAULT_PARSER,
+                   non_db=True)
 
         # Exit codes
-        spec.exit_code(
-            100, 'ERROR_NO_RETRIEVED_FOLDER', message='The retrieved folder data node could not be accessed.')
+        spec.exit_code(100,
+                       'ERROR_NO_RETRIEVED_FOLDER',
+                       message='The retrieved folder data node could not be accessed.')
 
         # Output parameters
         spec.output('output_parameters', valid_type=Dict, required=True, help='the results of the calculation')
         spec.output('output_structure', valid_type=StructureData, required=False, help='optional relaxed structure')
         spec.output('output_bands', valid_type=BandsData, required=False, help='optional band structure')
+
         spec.default_output_node = 'output_parameters'
-        
+
     # --------------------------------------------------------------------------
     def prepare_for_submission(self, folder):
         """Create the input files from the input nodes passed to this instance of the `CalcJob`.
