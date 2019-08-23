@@ -51,7 +51,6 @@ class Cp2kCalculation(CalcJob):
         spec.input('metadata.options.withmpi', valid_type=bool, default=True)
 
         # Default file names, parser, etc..
-<<<<<<< HEAD
         spec.input(
             'metadata.options.input_filename',
             valid_type=six.string_types,
@@ -65,20 +64,6 @@ class Cp2kCalculation(CalcJob):
         spec.input(
             'metadata.options.parser_name', valid_type=six.string_types, default=cls._DEFAULT_PARSER, non_db=True)
         spec.input('metadata.options.withmpi', valid_type=bool, default=True)
-=======
-        spec.input('metadata.options.input_filename',
-                   valid_type=six.string_types,
-                   default=cls._DEFAULT_INPUT_FILE,
-                   non_db=True)
-        spec.input('metadata.options.output_filename',
-                   valid_type=six.string_types,
-                   default=cls._DEFAULT_OUTPUT_FILE,
-                   non_db=True)
-        spec.input('metadata.options.parser_name',
-                   valid_type=six.string_types,
-                   default=cls._DEFAULT_PARSER,
-                   non_db=True)
->>>>>>> aiida1_multistage
 
         # Exit codes
         spec.exit_code(100,

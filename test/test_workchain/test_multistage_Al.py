@@ -37,25 +37,31 @@ print("EXPECTED: the OT (settings_0) will converge to a negative bandgap, then w
 structure = StructureData(ase=ase.io.read('../data/Al.cif'))
 
 # lowering the settings for acheaper calculation
-parameters = Dict(dict={
-        'FORCE_EVAL': {
-          'DFT': {
-            'MGRID': {
-              'CUTOFF': 280,
-              'REL_CUTOFF': 30,
-}}}})
+parameters = Dict(dict={'FORCE_EVAL': {
+    'DFT': {
+        'MGRID': {
+            'CUTOFF': 280,
+            'REL_CUTOFF': 30,
+        }
+    }
+}})
 
-protocol_mod = Dict(dict= {
+protocol_mod = Dict(dict={
     'initial_magnetization': {
         'Al': 0
-        },
+    },
     'settings_0': {
         'FORCE_EVAL': {
             'DFT': {
                 'SCF': {
                     'OUTER_SCF': {
                         'MAX_SCF': 5,
-}}}}}})
+                    }
+                }
+            }
+        }
+    }
+})
 
 options = {
     "resources": {
@@ -68,7 +74,7 @@ inputs = {
     'protocol_tag': Str('test'),
     'starting_settings_idx': Int(0),
     'protocol_modify': protocol_mod,
-    'base': {
+    'cp2k_base': {
         'cp2k': {
             'structure': structure,
             'parameters': parameters,

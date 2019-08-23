@@ -246,7 +246,7 @@ class Cp2kMultistageWorkChain(WorkChain):
         spec.exit_code(902,'ERROR_NO_MORE_SETTINGS',
             'Settings for Stage0 are not ok but there are no more robust settings to try')
         spec.expose_outputs(Cp2kBaseWorkChain, include=('output_structure','remote_folder'))
-        spec.output('last_input_parametestagesrs', valid_type=Dict, required=True)
+        spec.output('last_input_parameters', valid_type=Dict, required=True)
         spec.output('output_parameters', valid_type=Dict, required=True)
 
 
@@ -316,7 +316,7 @@ class Cp2kMultistageWorkChain(WorkChain):
 
         # Overwrite the generated input with the custom cp2k/parameters and give a label to BaseWC and Cp2kCalc
         if 'parameters' in self.exposed_inputs(Cp2kBaseWorkChain, 'cp2k_base')['cp2k']:
-            merge_dict(self.ctx.parameters, AttributeDict(self.exposed_inputs(Cp2kBaseWorkChain, 'base')['cp2k']['parameters'].get_dict()))
+            merge_dict(self.ctx.parameters, AttributeDict(self.exposed_inputs(Cp2kBaseWorkChain, 'cp2k_base')['cp2k']['parameters'].get_dict()))
         self.ctx.base_inp['cp2k']['parameters'] = Dict(dict = self.ctx.parameters).store()
         self.ctx.base_inp['metadata']['label'] = 'base({}/{})'.format(self.ctx.stage_tag,self.ctx.settings_tag,)
         self.ctx.base_inp['cp2k']['metadata']['label'] = self.ctx.base_inp['cp2k']['parameters'].get_dict()['GLOBAL']['RUN_TYPE']
